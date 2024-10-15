@@ -1,0 +1,120 @@
+comment_char %
+escape_char /
+
+% This file is a pseudo-glibc locale file for the English locale for the Netherlands.
+% It describes how different settings were taken from the en_US and nl_NL locales, and how some were custom made.
+
+% See for documentation https://github.com/simonvanlierde/locale-en-nl-macos
+
+LC_IDENTIFICATION
+title        "English locale for the Netherlands"
+source       "https://github.com/simonvanlierde/locale-en-nl-macos"
+address      ""
+contact      ""
+email        "simonvanlierde@gmail.com"
+tel          ""
+fax          ""
+language     "American English"
+territory    "Netherlands"
+revision     "1.0"
+date         "2024-10-16"
+
+category  "i18n:2012";LC_IDENTIFICATION
+category  "i18n:2012";LC_CTYPE 
+category  "i18n:2012";LC_COLLATE
+category  "i18n:2012";LC_NUMERIC
+category  "i18n:2012";LC_MESSAGES
+category  "i18n:2012";LC_MONETARY
+category  "i18n:2012";LC_TIME
+END LC_IDENTIFICATION
+
+LC_CTYPE
+% From en_US
+copy "en_US"
+END LC_CTYPE
+
+LC_COLLATE
+% From en_US
+copy "en_US"
+END LC_COLLATE
+
+LC_MESSAGES
+% From en_US
+copy "en_US"
+END LC_MESSAGES
+
+LC_NUMERIC
+% From en_US
+copy "en_US"
+END LC_NUMERIC
+
+LC_MONETARY
+% From nl_NL
+currency_symbol    "<U20AC>"
+int_curr_symbol    "EUR "
+% From en_US
+mon_decimal_point  "."
+mon_thousands_sep  ","
+mon_grouping       "3;3"
+positive_sign      ""
+negative_sign      "-"
+frac_digits        2
+int_frac_digits    2
+p_cs_precedes      1
+p_sep_by_space     0
+n_cs_precedes      1
+n_sep_by_space     0
+p_sign_posn        1
+n_sign_posn        1
+int_p_sep_by_space 1
+int_n_sep_by_space 1
+END LC_MONETARY
+
+LC_TIME
+% From en_US
+mon  "January";/
+     "February";/
+     "March";/
+     "April";/
+     "May";/
+     "June";/
+     "July";/
+     "August";/
+     "September";/
+     "October";/
+     "November";/
+     "December"
+abmon  "Jan";/
+       "Feb";/
+       "Mar";/
+       "Apr";/
+       "May";/
+       "Jun";/
+       "Jul";/
+       "Aug";/
+       "Sep";/
+       "Oct";/
+       "Nov";/
+       "Dec"
+day  "Sunday";/
+     "Monday";/
+     "Tuesday";/
+     "Wednesday";/
+     "Thursday";/
+     "Friday";/
+     "Saturday"
+abday  "Sun";/
+       "Mon";/
+       "Tue";/
+       "Wed";/
+       "Thu";/
+       "Fri";/
+       "Sat"
+am_pm         "am";"pm"
+t_fmt_ampm    "%I:%M:%S %p"
+% From nl_NL
+d_t_fmt       "%%a %e %b %X %Y"
+date_fmt      "%a %e %b %Y %X %Z"
+% Custom en_NL
+d_fmt               "%Y-%m-%d"
+END LC_TIME
