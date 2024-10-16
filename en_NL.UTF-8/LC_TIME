@@ -38,7 +38,7 @@ Friday
 Saturday
 %H:%M:%S
 %Y-%m-%d
-%a %e %b %X %Y
+%a %e %b %Y %X
 am
 pm
 %a %e %b %Y %X %Z

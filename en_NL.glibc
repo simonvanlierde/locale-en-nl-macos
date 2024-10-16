@@ -112,9 +112,8 @@ abday  "Sun";/
        "Sat"
 am_pm         "am";"pm"
 t_fmt_ampm    "%I:%M:%S %p"
-% From nl_NL
-d_t_fmt       "%%a %e %b %X %Y"
-date_fmt      "%a %e %b %Y %X %Z"
 % Custom en_NL
-d_fmt               "%Y-%m-%d"
+d_fmt         "%Y-%m-%d"
+d_t_fmt       "%a %e %b %Y %X"
+date_fmt      "%a %e %b %Y %X %Z"
 END LC_TIME
