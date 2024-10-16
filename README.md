@@ -1,8 +1,6 @@
-# locale-en-nl-macos
+# en_NL Locale for macOS
 
-**en_NL Locale for macOS**
-
-Custom locale `en_NL` for macOS that combines English and Dutch locale settings (e.g. euros and year-month-date formatting). Inspired by [PanderMusubi's locale-en-nl](https://github.com/PanderMusubi/locale-en-nl).
+Custom locale `en_NL` for macOS that combines English and Dutch locale settings (e.g., euros and year-month-date formatting). Inspired by [PanderMusubi's locale-en-nl](https://github.com/PanderMusubi/locale-en-nl).
 
 ## Table of Contents
 
