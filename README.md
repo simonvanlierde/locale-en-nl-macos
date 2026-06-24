@@ -1,80 +1,71 @@
 # en_NL Locale for macOS
 
-Custom locale `en_NL` for macOS that combines English and Dutch locale settings (e.g., euros and year-month-date formatting). Inspired by [PanderMusubi's locale-en-nl](https://github.com/PanderMusubi/locale-en-nl).
+Custom `en_NL` locale for macOS: **English language with Dutch conventions** —
+euros and ISO `YYYY-MM-DD` dates. Inspired by
+[PanderMusubi's locale-en-nl](https://github.com/PanderMusubi/locale-en-nl).
 
-## Table of Contents
-
-- [File Structure](#file-structure)
-- [Installation](#installation)
-  - [Notes](#notes)
-
-## File Structure
+## Install
 
 ```bash
-├── en_NL.UTF-8         # Custom locale files combining en_US and nl_NL
-├── reference_files     # Original macOS en_US and nl_NL files for reference
-├── copy_locales.sh     # Script to copy original locale files to the working directory
-├── en_NL.glibc         # Pseudo-glibc description of custom locale
-└── README.md
+git clone https://github.com/simonvanlierde/locale-en-nl-macos.git
+cd locale-en-nl-macos
+./install.sh --persist   # copies the locale to ~/.locale and updates ~/.zshrc
 ```
 
-## Installation
-
-1. Clone this repository:
-
-    ```bash
-    git clone https://github.com/yourusername/locale-en-nl-macos.git
-    cd locale-en-nl-macos
-    ```
-
-2. Create a custom locale directory:
-
-    ```bash
-    mkdir -p ~/.locale
-    ```
-
-3. Copy the custom locale files:
-
-    ```bash
-    cp -a en_NL.UTF-8 ~/.locale
-    ```
-
-4. Set `PATH_LOCALE` accordingly:
-
-    ```bash
-    export PATH_LOCALE=~/.locale:$PATH_LOCALE
-    ```
-
-5. Set the custom locale:
-
-    ```bash
-    export LC_ALL=en_NL.UTF-8
-    ```
-
-6. Run `locale` to confirm that the custom locale is applied:
-
-    ```bash
-    locale
-    ```
-
-### Notes
-
-To make these changes persistent, add the following lines to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`):
+Then reload your shell (`source ~/.zshrc`) and confirm:
 
 ```bash
-export PATH_LOCALE=~/.locale:$PATH_LOCALE
+locale          # LC_ALL=en_NL.UTF-8
+date +%x        # 2026-06-23  (ISO date)
+```
+
+Run `./install.sh` without `--persist` to copy the files and print the export
+lines instead of editing your shell config.
+
+### Manual install
+
+```bash
+mkdir -p ~/.locale
+cp -a en_NL.UTF-8 ~/.locale
+```
+
+Add to `~/.zshrc` (or `~/.bashrc`):
+
+```bash
+export PATH_LOCALE=$HOME/.locale:${PATH_LOCALE:-}
 export LC_ALL=en_NL.UTF-8
 ```
 
-After updating your shell configuration, reload it:
-
-```bash
-source ~/.bashrc  # or ~/.zshrc
-```
-
-To set specific categories (e.g., date or currency), you can use:
+To scope a single category instead of `LC_ALL`, e.g.:
 
 ```bash
 export LC_TIME=en_NL.UTF-8
 export LC_MONETARY=en_NL.UTF-8
 ```
+
+## Design
+
+Each locale category is either copied from `en_US` or customized:
+
+| Category      | Source / customization                          |
+| ------------- | ----------------------------------------------- |
+| `LC_CTYPE`    | `en_US` (identical)                             |
+| `LC_COLLATE`  | `en_US` (identical)                             |
+| `LC_NUMERIC`  | `en_US` (identical)                             |
+| `LC_MESSAGES` | `en_US` yes/no patterns                         |
+| `LC_MONETARY` | euro symbol (€/EUR) + `en_US` separators        |
+| `LC_TIME`     | `en_US` month/day names + ISO `%Y-%m-%d` date   |
+
+## Repository layout
+
+```bash
+├── en_NL.UTF-8/        # the custom locale files
+├── install.sh          # copy the locale to ~/.locale (+ optional --persist)
+├── copy_locales.sh     # regenerate the local reference baseline for diffing
+├── README.md
+└── LICENSE
+```
+
+`copy_locales.sh` copies the system `en_US` and `nl_NL` locales into a
+git-ignored `reference_files/` directory, used only when maintaining the custom
+locale.
