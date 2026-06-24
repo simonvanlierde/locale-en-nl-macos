@@ -1,38 +1,30 @@
 #!/usr/bin/env bash
+#
+# Regenerate the local reference baseline of macOS system locales.
+# Output (reference_files/) is git-ignored and used only for diffing when
+# maintaining the custom en_NL locale.
 
-# Set source and destination directories
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="/usr/share/locale"
-DEST_DIR="$HOME/code/personal/locale-en-nl-macos/reference-files" # Destination for copied files
+DEST_DIR="$SCRIPT_DIR/reference_files"
 
-# Create the destination directory if it doesn't exist
-mkdir -p "$DEST_DIR"
-
-copy_original_files() {
-    local src_dir="$1"
-    local dst_dir="$2"
-
-    mkdir -p "$dst_dir" # Ensure the target directory exists
-
-    for item in "$src_dir"/*; do
-        if [ -L "$item" ] || [ -f "$item" ]; then
-            # Get real path of the file and copy it to the destination
-            cp "$(realpath "$item")" "$dst_dir/"
-            echo "Copied $item to $dst_dir"
-        elif [ -d "$item" ]; then
-            # Recursively handle subdirectories
-            copy_original_files "$item" "$dst_dir/$(basename "$item")"
-        fi
-    done
-}
-
-# Wrapper function to copy locale by name
+# Copy a locale directory, resolving symlinks so the real files land on disk.
 copy_locale() {
-    local locale_name="$1"
-    copy_original_files "$SOURCE_DIR/$locale_name" "$DEST_DIR/$locale_name"
+    local name="$1"
+    local src="$SOURCE_DIR/$name"
+    local dst="$DEST_DIR/$name"
+
+    find "$src" -type f -o -type l | while read -r item; do
+        local rel="${item#"$src"/}"
+        mkdir -p "$dst/$(dirname "$rel")"
+        cp "$(realpath "$item")" "$dst/$rel"
+    done
+    echo "Copied $name to $dst"
 }
 
-# Call the copy function for any locale you want to copy
 copy_locale "en_US.UTF-8"
 copy_locale "nl_NL.UTF-8"
 
-echo "All files copied to $DEST_DIR."
+echo "Reference files written to $DEST_DIR."
