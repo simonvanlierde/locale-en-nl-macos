@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck install.sh copy_locales.sh
+
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats
+        run: sudo apt-get update && sudo apt-get install -y bats
+      - name: Run tests
+        run: bats test/
+
+  smoke:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install and activate the locale
+        run: |
+          ./install.sh
+          export PATH_LOCALE="$HOME/.locale" LC_ALL=en_NL.UTF-8
+          out=$(date -j -f "%Y-%m-%d %H:%M:%S" "2026-01-02 15:04:05" "+%x %X")
+          echo "Formatted: $out"
+          [ "$out" = "2026-01-02 15:04:05" ]
