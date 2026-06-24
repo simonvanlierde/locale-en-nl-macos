@@ -3,8 +3,12 @@
 # Install the custom en_NL.UTF-8 locale into ~/.locale.
 #
 # Usage:
-#   ./install.sh            Copy the locale and print the shell config to add.
-#   ./install.sh --persist  Also append the config to ~/.zshrc (idempotent).
+#   ./install.sh                  Copy the locale and print the shell config to add.
+#   ./install.sh --persist        Also append the config to the rc file of the
+#                                 current shell, auto-detected from $SHELL
+#                                 (zsh -> ~/.zshrc, bash -> ~/.bash_profile,
+#                                 other -> ~/.profile). Idempotent.
+#   ./install.sh --persist=<file> Persist to an explicit rc file instead.
 
 set -euo pipefail
 
@@ -18,12 +22,27 @@ EXPORT_LINES=(
 )
 MARKER="# en_NL custom locale"
 
+# Pick the rc file for the current shell (basename of $SHELL).
+default_rc() {
+    case "$(basename "${SHELL:-}")" in
+        zsh)  echo "$HOME/.zshrc" ;;
+        bash) echo "$HOME/.bash_profile" ;;
+        *)    echo "$HOME/.profile" ;;
+    esac
+}
+
 mkdir -p "$DEST"
 cp -a "$SCRIPT_DIR/$LOCALE" "$DEST/"
 echo "Installed $LOCALE to $DEST/"
 
-if [ "${1:-}" = "--persist" ]; then
-    RC="$HOME/.zshrc"
+case "${1:-}" in
+    --persist)        RC="$(default_rc)" ;;
+    --persist=*)      RC="${1#--persist=}" ;;
+    "")               RC="" ;;
+    *)                echo "Unknown argument: $1" >&2; exit 2 ;;
+esac
+
+if [ -n "$RC" ]; then
     if grep -qF "$MARKER" "$RC" 2>/dev/null; then
         echo "Shell config already present in $RC; skipping."
     else
