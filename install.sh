@@ -31,16 +31,16 @@ default_rc() {
     esac
 }
 
-mkdir -p "$DEST"
-cp -a "$SCRIPT_DIR/$LOCALE" "$DEST/"
-echo "Installed $LOCALE to $DEST/"
-
 case "${1:-}" in
     --persist)        RC="$(default_rc)" ;;
     --persist=*)      RC="${1#--persist=}" ;;
     "")               RC="" ;;
     *)                echo "Unknown argument: $1" >&2; exit 2 ;;
 esac
+
+mkdir -p "$DEST"
+cp -a "$SCRIPT_DIR/$LOCALE" "$DEST/"
+echo "Installed $LOCALE to $DEST/"
 
 if [ -n "$RC" ]; then
     if grep -qF "$MARKER" "$RC" 2>/dev/null; then

@@ -55,3 +55,9 @@ teardown() {
     [ "$status" -eq 0 ]
     grep -qF "export LC_ALL=en_NL.UTF-8" "$HOME/custom.rc"
 }
+
+@test "unknown argument exits 2 without installing anything" {
+    run "$REPO/install.sh" --bogus
+    [ "$status" -eq 2 ]
+    [ ! -e "$HOME/.locale" ]
+}
