@@ -45,8 +45,9 @@ This removes `~/.locale/en_NL.UTF-8` and the block `--persist` added between
 the `# en_NL custom locale` marker comments in the auto-detected rc file. Use
 `--uninstall=<file>` for a specific file. Open a new shell afterwards.
 
-An older install exported `LC_ALL`; run `./install.sh --uninstall` and then
-`./install.sh --persist` to switch to the current exports.
+An install from before October 2026 wrote a `PATH_LOCALE` list that macOS
+cannot read, so the locale never loaded; run `./install.sh --uninstall` and
+then `./install.sh --persist` to replace it.
 
 ## Notes
 

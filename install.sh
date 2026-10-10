@@ -24,8 +24,10 @@ DEST="$HOME/.locale"
 # category, and ssh forwards LC_* to hosts that may not have this locale.
 # LANG covers the other categories, so it gets a UTF-8 default where the
 # terminal leaves it unset; otherwise text handling would fall back to C.
+# PATH_LOCALE is one directory on macOS, searched before the system locales;
+# a colon-separated list makes every lookup fail and fall back to C.
 EXPORT_LINES=(
-    "export PATH_LOCALE=\$HOME/.locale:\${PATH_LOCALE:-}"
+    "export PATH_LOCALE=\$HOME/.locale"
     "export LANG=\${LANG:-en_US.UTF-8}"
     "export LC_TIME=$LOCALE"
     "export LC_MONETARY=$LOCALE"
@@ -95,8 +97,8 @@ echo "Installed $LOCALE to $DEST/"
 if [ -n "$RC" ]; then
     if grep -qxF "$MARKER" "$RC" 2>/dev/null; then
         echo "Shell config already present in $RC; skipping."
-        if grep -qF "export LC_ALL=$LOCALE" "$RC"; then
-            echo "It is from an older version that exports LC_ALL. To update it, run:"
+        if grep -qF "PATH_LOCALE=\$HOME/.locale:" "$RC"; then
+            echo "It is from an older version whose PATH_LOCALE does not load on macOS. To update it, run:"
             echo "    $0 --uninstall=$RC && $0 --persist=$RC"
         fi
     else
