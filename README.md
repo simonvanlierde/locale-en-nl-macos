@@ -52,6 +52,10 @@ An older install exported `LC_ALL`; run `./install.sh --uninstall` and then
 Numbers use US grouping (`1,234.56`), not Dutch (`1.234,56`). The language is
 English, so `LC_NUMERIC` stays aligned with `en_US`.
 
+The locale only reaches programs started from a shell that has these
+environment variables, so terminal programs pick it up; GUI apps ignore them
+and follow the formats set in System Settings.
+
 macOS's ssh client forwards `LC_*` variables (`SendEnv LANG LC_*` in
 `/etc/ssh/ssh_config`), so a remote host without `en_NL.UTF-8` will warn about
 `LC_TIME` and `LC_MONETARY`; set both to a locale it has in its own shell rc
@@ -63,3 +67,8 @@ file, or remove `LC_*` from that `SendEnv` line.
 install unit tests. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
 runs both on Linux plus a macOS job that activates the locale and asserts ISO
 date / 24-hour output.
+
+## Licence
+
+GPL-3.0; see [`LICENSE`](LICENSE). The `LC_CTYPE` and `LC_COLLATE` files are
+copied unchanged from macOS's `en_US.UTF-8` locale data.
