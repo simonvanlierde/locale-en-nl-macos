@@ -22,8 +22,11 @@ DEST="$HOME/.locale"
 
 # Only the categories that differ from en_US. LC_ALL would override every
 # category, and ssh forwards LC_* to hosts that may not have this locale.
+# LANG covers the other categories, so it gets a UTF-8 default where the
+# terminal leaves it unset; otherwise text handling would fall back to C.
 EXPORT_LINES=(
     "export PATH_LOCALE=\$HOME/.locale:\${PATH_LOCALE:-}"
+    "export LANG=\${LANG:-en_US.UTF-8}"
     "export LC_TIME=$LOCALE"
     "export LC_MONETARY=$LOCALE"
 )
@@ -47,7 +50,7 @@ remove_block() {
     tmp="$(mktemp)"
     awk -v begin="$MARKER" -v end="$END_MARKER" '
         inblock && $0 == end { inblock = 0; next }
-        inblock && /^export (PATH_LOCALE|LC_ALL|LC_TIME|LC_MONETARY)=/ { next }
+        inblock && /^export (PATH_LOCALE|LANG|LC_ALL|LC_TIME|LC_MONETARY)=/ { next }
         { inblock = 0 }
         $0 == begin { inblock = 1; held = 0; next }
         held { print ""; held = 0 }
@@ -56,8 +59,10 @@ remove_block() {
         END { if (held) print "" }
     ' "$rc" >"$tmp"
     # Write through cat so a symlinked rc file keeps its link and permissions.
+    # The redirect empties the file first, so keep a copy until it succeeds.
+    cp "$rc" "$rc.bak"
     cat "$tmp" >"$rc"
-    rm -f "$tmp"
+    rm -f "$tmp" "$rc.bak"
 }
 
 ACTION=install
@@ -90,6 +95,10 @@ echo "Installed $LOCALE to $DEST/"
 if [ -n "$RC" ]; then
     if grep -qxF "$MARKER" "$RC" 2>/dev/null; then
         echo "Shell config already present in $RC; skipping."
+        if grep -qF "export LC_ALL=$LOCALE" "$RC"; then
+            echo "It is from an older version that exports LC_ALL. To update it, run:"
+            echo "    $0 --uninstall=$RC && $0 --persist=$RC"
+        fi
     else
         {
             echo ""

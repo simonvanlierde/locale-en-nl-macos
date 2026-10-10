@@ -88,3 +88,18 @@ teardown() {
     [[ "$output" == *"No shell config found"* ]]
     [ "$(cat "$HOME/.zshrc")" = "keep" ]
 }
+
+@test "the persisted block defaults LANG to UTF-8 only when it is unset" {
+    "$REPO/install.sh" "--persist=$HOME/custom.rc"
+    run env -u LANG bash -c '. "$1"; echo "$LANG"' _ "$HOME/custom.rc"
+    [ "$output" = "en_US.UTF-8" ]
+    run env LANG=nl_NL.UTF-8 bash -c '. "$1"; echo "$LANG"' _ "$HOME/custom.rc"
+    [ "$output" = "nl_NL.UTF-8" ]
+}
+
+@test "--persist over an old LC_ALL block prints the update steps" {
+    printf '\n# en_NL custom locale\nexport LC_ALL=en_NL.UTF-8\n' >"$HOME/custom.rc"
+    run "$REPO/install.sh" "--persist=$HOME/custom.rc"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"--uninstall=$HOME/custom.rc"* ]]
+}

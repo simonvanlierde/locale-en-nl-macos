@@ -34,3 +34,12 @@ jobs:
           out=$(date -j -f "%Y-%m-%d %H:%M:%S" "2026-01-02 15:04:05" "+%x %X")
           echo "Formatted: $out"
           [ "$out" = "2026-01-02 15:04:05" ]
+      - name: Persisted block keeps UTF-8 text handling with LANG unset
+        run: |
+          ./install.sh --persist="$RUNNER_TEMP/rc"
+          env -i HOME="$HOME" PATH="$PATH" bash -c '
+            . "$1"
+            locale
+            locale | grep -q "^LC_CTYPE=.*UTF-8"
+            [ "$(date -j -f "%Y-%m-%d %H:%M:%S" "2026-01-02 15:04:05" "+%x %X")" = "2026-01-02 15:04:05" ]
+          ' _ "$RUNNER_TEMP/rc"

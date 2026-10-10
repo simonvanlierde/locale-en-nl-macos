@@ -16,7 +16,8 @@ Inspired by [PanderMusubi/locale-en-nl](https://github.com/PanderMusubi/locale-e
 | `LC_CTYPE` / `LC_COLLATE` / `LC_NUMERIC` | identical to `en_US`                         |
 
 Only `LC_TIME` and `LC_MONETARY` differ from `en_US`, so the installer exports
-just those two and leaves `LANG` and the other categories alone.
+just those two. It also sets `LANG=en_US.UTF-8` when `LANG` is unset, so the
+other categories keep UTF-8 text handling; an existing `LANG` is left alone.
 
 ## Install
 
