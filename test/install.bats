@@ -17,7 +17,9 @@ teardown() {
     run "$REPO/install.sh"
     [ "$status" -eq 0 ]
     [ -f "$HOME/.locale/en_NL.UTF-8/LC_TIME" ]
-    [[ "$output" == *"export LC_ALL=en_NL.UTF-8"* ]]
+    [[ "$output" == *"export LC_TIME=en_NL.UTF-8"* ]]
+    [[ "$output" == *"export LC_MONETARY=en_NL.UTF-8"* ]]
+    [[ "$output" != *"LC_ALL"* ]]
 }
 
 @test "plain run does not create any rc file" {
@@ -32,7 +34,7 @@ teardown() {
     SHELL=/bin/zsh run "$REPO/install.sh" --persist
     [ "$status" -eq 0 ]
     grep -qF "# en_NL custom locale" "$HOME/.zshrc"
-    grep -qF "export LC_ALL=en_NL.UTF-8" "$HOME/.zshrc"
+    grep -qF "export LC_TIME=en_NL.UTF-8" "$HOME/.zshrc"
 }
 
 @test "--persist writes ~/.bash_profile for bash" {
@@ -53,7 +55,7 @@ teardown() {
 @test "--persist=<file> honours the override" {
     run "$REPO/install.sh" "--persist=$HOME/custom.rc"
     [ "$status" -eq 0 ]
-    grep -qF "export LC_ALL=en_NL.UTF-8" "$HOME/custom.rc"
+    grep -qF "export LC_TIME=en_NL.UTF-8" "$HOME/custom.rc"
 }
 
 @test "unknown argument exits 2 without installing anything" {

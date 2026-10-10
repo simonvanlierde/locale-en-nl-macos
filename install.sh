@@ -16,9 +16,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOCALE="en_NL.UTF-8"
 DEST="$HOME/.locale"
 
+# Only the categories that differ from en_US. LC_ALL would override every
+# category, and ssh forwards LC_* to hosts that may not have this locale.
 EXPORT_LINES=(
     "export PATH_LOCALE=\$HOME/.locale:\${PATH_LOCALE:-}"
-    "export LC_ALL=$LOCALE"
+    "export LC_TIME=$LOCALE"
+    "export LC_MONETARY=$LOCALE"
 )
 MARKER="# en_NL custom locale"
 

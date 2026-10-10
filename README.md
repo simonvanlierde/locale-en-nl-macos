@@ -15,6 +15,9 @@ Inspired by [PanderMusubi/locale-en-nl](https://github.com/PanderMusubi/locale-e
 | `LC_MESSAGES`                            | `en_US` yes/no patterns                      |
 | `LC_CTYPE` / `LC_COLLATE` / `LC_NUMERIC` | identical to `en_US`                         |
 
+Only `LC_TIME` and `LC_MONETARY` differ from `en_US`, so the installer exports
+just those two and leaves `LANG` and the other categories alone.
+
 ## Install
 
 ```bash
@@ -35,6 +38,11 @@ add manually. Use `--persist=<file>` to target a specific file.
 
 Numbers use US grouping (`1,234.56`), not Dutch (`1.234,56`). The language is
 English, so `LC_NUMERIC` stays aligned with `en_US`.
+
+macOS's ssh client forwards `LC_*` variables (`SendEnv LANG LC_*` in
+`/etc/ssh/ssh_config`), so a remote host without `en_NL.UTF-8` will warn about
+`LC_TIME` and `LC_MONETARY`; set both to a locale it has in its own shell rc
+file, or remove `LC_*` from that `SendEnv` line.
 
 ## Tests
 

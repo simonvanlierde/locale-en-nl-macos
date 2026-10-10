@@ -29,7 +29,8 @@ jobs:
       - name: Install and activate the locale
         run: |
           ./install.sh
-          export PATH_LOCALE="$HOME/.locale" LC_ALL=en_NL.UTF-8
+          unset LC_ALL
+          export PATH_LOCALE="$HOME/.locale" LC_TIME=en_NL.UTF-8
           out=$(date -j -f "%Y-%m-%d %H:%M:%S" "2026-01-02 15:04:05" "+%x %X")
           echo "Formatted: $out"
           [ "$out" = "2026-01-02 15:04:05" ]
