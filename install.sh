@@ -9,6 +9,10 @@
 #                                 (zsh -> ~/.zshrc, bash -> ~/.bash_profile,
 #                                 other -> ~/.profile). Idempotent.
 #   ./install.sh --persist=<file> Persist to an explicit rc file instead.
+#   ./install.sh --uninstall      Remove the locale and the block --persist added
+#                                 to the auto-detected rc file.
+#   ./install.sh --uninstall=<file>
+#                                 Same, for an explicit rc file.
 
 set -euo pipefail
 
@@ -24,6 +28,7 @@ EXPORT_LINES=(
     "export LC_MONETARY=$LOCALE"
 )
 MARKER="# en_NL custom locale"
+END_MARKER="# en_NL custom locale end"
 
 # Pick the rc file for the current shell (basename of $SHELL).
 default_rc() {
@@ -34,25 +39,63 @@ default_rc() {
     esac
 }
 
+# Delete the marked block from $1, with the blank line written before it.
+# Blocks from older versions have no end marker, so a block also ends at the
+# first line that is not one of its exports.
+remove_block() {
+    local rc="$1" tmp
+    tmp="$(mktemp)"
+    awk -v begin="$MARKER" -v end="$END_MARKER" '
+        inblock && $0 == end { inblock = 0; next }
+        inblock && /^export (PATH_LOCALE|LC_ALL|LC_TIME|LC_MONETARY)=/ { next }
+        { inblock = 0 }
+        $0 == begin { inblock = 1; held = 0; next }
+        held { print ""; held = 0 }
+        $0 == "" { held = 1; next }
+        { print }
+        END { if (held) print "" }
+    ' "$rc" >"$tmp"
+    # Write through cat so a symlinked rc file keeps its link and permissions.
+    cat "$tmp" >"$rc"
+    rm -f "$tmp"
+}
+
+ACTION=install
 case "${1:-}" in
     --persist)        RC="$(default_rc)" ;;
     --persist=*)      RC="${1#--persist=}" ;;
+    --uninstall)      ACTION=uninstall; RC="$(default_rc)" ;;
+    --uninstall=*)    ACTION=uninstall; RC="${1#--uninstall=}" ;;
     "")               RC="" ;;
     *)                echo "Unknown argument: $1" >&2; exit 2 ;;
 esac
+
+if [ "$ACTION" = uninstall ]; then
+    rm -rf "${DEST:?}/$LOCALE"
+    rmdir "$DEST" 2>/dev/null || true
+    echo "Removed $DEST/$LOCALE"
+    if grep -qxF "$MARKER" "$RC" 2>/dev/null; then
+        remove_block "$RC"
+        echo "Removed shell config from $RC. Open a new shell to drop the exports."
+    else
+        echo "No shell config found in $RC."
+    fi
+    exit 0
+fi
 
 mkdir -p "$DEST"
 cp -a "$SCRIPT_DIR/$LOCALE" "$DEST/"
 echo "Installed $LOCALE to $DEST/"
 
 if [ -n "$RC" ]; then
-    if grep -qF "$MARKER" "$RC" 2>/dev/null; then
+    if grep -qxF "$MARKER" "$RC" 2>/dev/null; then
         echo "Shell config already present in $RC; skipping."
     else
         {
             echo ""
             echo "$MARKER"
             printf '%s\n' "${EXPORT_LINES[@]}"
+            echo "$END_MARKER"
         } >>"$RC"
         echo "Appended shell config to $RC. Run: source $RC"
     fi

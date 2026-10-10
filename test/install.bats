@@ -49,7 +49,7 @@ teardown() {
     SHELL=/bin/zsh run "$REPO/install.sh" --persist
     [ "$status" -eq 0 ]
     [[ "$output" == *"already present"* ]]
-    [ "$(grep -cF "# en_NL custom locale" "$HOME/.zshrc")" -eq 1 ]
+    [ "$(grep -cxF "# en_NL custom locale" "$HOME/.zshrc")" -eq 1 ]
 }
 
 @test "--persist=<file> honours the override" {
@@ -62,4 +62,29 @@ teardown() {
     run "$REPO/install.sh" --bogus
     [ "$status" -eq 2 ]
     [ ! -e "$HOME/.locale" ]
+}
+
+@test "--uninstall removes the locale and only the persisted block" {
+    printf 'before\n' >"$HOME/.zshrc"
+    SHELL=/bin/zsh "$REPO/install.sh" --persist
+    printf 'after\n' >>"$HOME/.zshrc"
+    SHELL=/bin/zsh run "$REPO/install.sh" --uninstall
+    [ "$status" -eq 0 ]
+    [ ! -e "$HOME/.locale/en_NL.UTF-8" ]
+    [ "$(cat "$HOME/.zshrc")" = "$(printf 'before\nafter')" ]
+}
+
+@test "--uninstall=<file> removes a block without an end marker" {
+    printf 'before\n\n# en_NL custom locale\nexport PATH_LOCALE=$HOME/.locale:${PATH_LOCALE:-}\nexport LC_ALL=en_NL.UTF-8\nafter\n' >"$HOME/custom.rc"
+    run "$REPO/install.sh" "--uninstall=$HOME/custom.rc"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$HOME/custom.rc")" = "$(printf 'before\nafter')" ]
+}
+
+@test "--uninstall without a persisted block leaves the rc file alone" {
+    printf 'keep\n' >"$HOME/.zshrc"
+    SHELL=/bin/zsh run "$REPO/install.sh" --uninstall
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"No shell config found"* ]]
+    [ "$(cat "$HOME/.zshrc")" = "keep" ]
 }

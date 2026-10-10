@@ -34,6 +34,19 @@ command to reload.
 Without `--persist` it copies the files and prints the export lines for you to
 add manually. Use `--persist=<file>` to target a specific file.
 
+## Uninstall
+
+```bash
+./install.sh --uninstall
+```
+
+This removes `~/.locale/en_NL.UTF-8` and the block `--persist` added between
+the `# en_NL custom locale` marker comments in the auto-detected rc file. Use
+`--uninstall=<file>` for a specific file. Open a new shell afterwards.
+
+An older install exported `LC_ALL`; run `./install.sh --uninstall` and then
+`./install.sh --persist` to switch to the current exports.
+
 ## Notes
 
 Numbers use US grouping (`1,234.56`), not Dutch (`1.234,56`). The language is
