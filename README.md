@@ -1,5 +1,8 @@
 # en_NL Locale for macOS
 
+[![CI](https://github.com/simonvanlierde/locale-en-nl-macos/actions/workflows/ci.yml/badge.svg)](https://github.com/simonvanlierde/locale-en-nl-macos/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+
 A custom `en_NL.UTF-8` locale for macOS: English language, European conventions.
 Euros, ISO `YYYY-MM-DD` dates, and 24-hour time — without switching your system
 language away from English.
