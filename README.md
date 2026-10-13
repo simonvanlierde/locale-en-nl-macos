@@ -18,9 +18,8 @@ Inspired by [PanderMusubi/locale-en-nl](https://github.com/PanderMusubi/locale-e
 | `LC_MESSAGES`                            | `en_US` yes/no patterns                      |
 | `LC_CTYPE` / `LC_COLLATE` / `LC_NUMERIC` | identical to `en_US`                         |
 
-Only `LC_TIME` and `LC_MONETARY` differ from `en_US`, so the installer exports
-just those two. When `LANG` is unset, it also sets `LANG=en_US.UTF-8`, so the
-other categories keep UTF-8 text handling. It leaves an existing `LANG` alone.
+So numbers keep US grouping (`1,234.56`). The installer exports only `LC_TIME`
+and `LC_MONETARY`, and sets `LANG=en_US.UTF-8` when `LANG` is unset.
 
 ## Install
 
@@ -30,49 +29,32 @@ cd locale-en-nl-macos
 ./install.sh --persist
 ```
 
-`--persist` copies the locale to `~/.locale` and adds the exports to the end of
-your shell's rc file. It picks that file from `$SHELL` (zsh → `~/.zshrc`, bash →
-`~/.bash_profile`, otherwise `~/.profile`). The script then prints the exact
-`source` command to reload it.
+`--persist` copies the locale to `~/.locale` and adds the exports to your shell's
+rc file, picked from `$SHELL`. Use `--persist=<file>` to choose the file, or leave
+the flag out to get the export lines printed instead.
 
-Without `--persist`, it copies the files and prints the export lines for you to
-add yourself. Use `--persist=<file>` to write to a file of your choice.
-
-## Uninstall
-
-```bash
-./install.sh --uninstall
-```
-
-This removes `~/.locale/en_NL.UTF-8`. It also removes the block that `--persist`
-added to the auto-detected rc file, between the `# en_NL custom locale` marker
-comments. Use `--uninstall=<file>` for a file of your choice. Open a new shell
-afterwards.
-
-An install from before October 2026 wrote a `PATH_LOCALE` list that macOS
-cannot read, so the locale never loaded. To replace it, run
-`./install.sh --uninstall` and then `./install.sh --persist`.
+To uninstall, run `./install.sh --uninstall` (or `--uninstall=<file>`) and open a
+new shell. An install from before October 2026 never loaded the locale: run
+`./install.sh --uninstall` and then `./install.sh --persist` to replace it.
 
 ## Notes
 
-Numbers use US grouping (`1,234.56`), not Dutch (`1.234,56`). The language is
-English, so I kept `LC_NUMERIC` the same as `en_US`.
+The locale only reaches programs started from a shell that has these variables.
+GUI apps follow the formats set in System Settings.
 
-The locale only reaches programs started from a shell that has these
-environment variables. Terminal programs pick it up. GUI apps ignore the
-variables and follow the formats set in System Settings.
-
-macOS's ssh client forwards `LC_*` variables (`SendEnv LANG LC_*` in
-`/etc/ssh/ssh_config`). A remote host without `en_NL.UTF-8` will then warn about
-`LC_TIME` and `LC_MONETARY`. To fix that, set both to a locale the host has, in
-its own shell rc file, or remove `LC_*` from that `SendEnv` line.
+macOS's ssh client forwards `LC_*` variables, so a remote host without
+`en_NL.UTF-8` warns about `LC_TIME` and `LC_MONETARY`. Set both to a locale the
+host has, in its own shell rc file, or remove `LC_*` from `SendEnv` in
+`/etc/ssh/ssh_config`.
 
 ## Tests
 
-`shellcheck install.sh copy_locales.sh` lints the scripts, and `bats test/` runs
-the unit tests for the installer. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
-runs both on Linux. It also runs a macOS job that turns the locale on and checks
-for ISO dates and 24-hour time in the output.
+```bash
+shellcheck install.sh copy_locales.sh
+bats test/
+```
+
+CI also runs a macOS job that turns the locale on and checks the output.
 
 ## Licence
 
