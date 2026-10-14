@@ -9,14 +9,14 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: shellcheck
         run: shellcheck install.sh copy_locales.sh
 
   unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install bats
         run: sudo apt-get update && sudo apt-get install -y bats
       - name: Run tests
@@ -25,7 +25,7 @@ jobs:
   smoke:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install and activate the locale
         run: |
           ./install.sh
