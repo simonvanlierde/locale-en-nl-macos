@@ -1,0 +1,11 @@
+# Weekly updates to the commit-pinned actions, grouped as in project-templates. `cooldown` holds
+# an update back until the release has been public for a week, long enough for a compromised
+# release to be caught and yanked. Security updates ignore it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: {interval: weekly}
+    cooldown: {default-days: 7}
+    groups:
+      actions: {patterns: ["*"]}
